@@ -8,7 +8,12 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,7 +21,7 @@ import java.time.LocalDateTime;
 @Table(name = "users", uniqueConstraints = {//创建表格
         @UniqueConstraint(columnNames = "email")//email是独一无二的
 })
-public class User {
+public class User implements UserDetails {
     @Id// 定义主键
     @GeneratedValue(strategy = GenerationType.AUTO) // 主键自增
     private Long id;
@@ -37,14 +42,51 @@ public class User {
     @CreationTimestamp//自动生成创建时间
     private LocalDateTime createdAt;
 
+    public User() {
+    }
+
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
     }
 
-    public User() {
+    /**
+     * Spring Security 需要的方法
+     */
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        // 账号是否未过期，返回true表示不过期
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        // 账号是否未被锁定，返回true表示未锁定
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        // 凭据是否未过期，返回true表示不过期
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        // 账号是否可用，返回true表示可用
+        return true;
+    }
+
+    @Override
+    public String getUsername() {
+        return  email; // 使用 email 作为用户名
     }
 }
 
